@@ -16,7 +16,7 @@ public class CpuPlayer extends Player {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), board, name);
+        return Objects.hash((Integer)super.hashCode(), board, name);
     }
 
     public CpuPlayer(String name, Board board, Color color){

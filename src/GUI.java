@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.UnknownHostException;
 import javax.swing.*;
 
 public class GUI {
@@ -43,7 +44,11 @@ public class GUI {
         play.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                game.menu.startNewGame();
+                try {
+                    game.menu.startNewGame();
+                } catch (UnknownHostException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 

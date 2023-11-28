@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -168,7 +169,7 @@ public class NetworkAdapter {
          * The message type, along with any optional parameters
          * such as x and y, are passed as arguments to the function.
          */
-        void messageReceived(MessageType type, int x, int y);
+        void messageReceived(MessageType type, int x, int y) throws UnknownHostException;
     }
 
     /** Listener to be called upon receipt of a message. */
@@ -249,7 +250,7 @@ public class NetworkAdapter {
      * @see #setMessageListener(MessageListener)
      * @see #receiveMessagesAsync()
      */
-    public void receiveMessages() {
+    public void receiveMessages() throws UnknownHostException {
         String line;
         try {
             while ((line = in.readLine()) != null) {
@@ -276,11 +277,17 @@ public class NetworkAdapter {
      * @see #receiveMessages()
      */
     public void receiveMessagesAsync() {
-        new Thread(this::receiveMessages).start();
+            new Thread(() -> {
+                try {
+                    receiveMessages();
+                } catch (UnknownHostException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
     }
 
     /** Parse the given message and notify to the registered listener. */
-    private void parseMessage(String msg) {
+    private void parseMessage(String msg) throws UnknownHostException {
         if (msg.startsWith(MessageType.QUIT.header)) {
             notifyMessage(MessageType.QUIT);
         } else if (msg.startsWith(MessageType.PLAY_ACK.header)) {
@@ -306,7 +313,7 @@ public class NetworkAdapter {
     }
 
     /** Parse and notify the given play_ack message body. */
-    private void parsePlayAckMessage(String msgBody) {
+    private void parsePlayAckMessage(String msgBody) throws UnknownHostException {
         String[] m = msgBody.split(",");
         int response = parseInt(m[0].trim()) == 0 ? 0 : 1;
         int turn = 0;
@@ -329,7 +336,7 @@ public class NetworkAdapter {
     }
 
     /** Parse and notify the given move or move_ack message. */
-    private void parseMoveMessage(MessageType type, String msgBody) {
+    private void parseMoveMessage(MessageType type, String msgBody) throws UnknownHostException {
         String[] parts = msgBody.split(",");
         if (parts.length >= 2) {
             int x = parseInt(parts[0].trim());
@@ -404,12 +411,12 @@ public class NetworkAdapter {
     /**
      * Notify the listener of the receipt of a specific message type.
      */
-    private void notifyMessage(MessageType type) {
+    private void notifyMessage(MessageType type) throws UnknownHostException {
         listener.messageReceived(type, 0, 0);
     }
 
     /** Notify the listener of the receipt of the given message. */
-    private void notifyMessage(MessageType type, int x, int y) {
+    private void notifyMessage(MessageType type, int x, int y) throws UnknownHostException {
         listener.messageReceived(type, x, y);
     }
 

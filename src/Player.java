@@ -22,7 +22,7 @@ public abstract class Player {
 
     @Override
     public int hashCode() {
-        return Objects.hash(symbol, color);
+        return Objects.hash((Character)symbol, color);
     }
 
     public abstract Color getColor();

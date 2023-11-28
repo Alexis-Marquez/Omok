@@ -3,6 +3,8 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.net.UnknownHostException;
+
 class MenuGUI {
     private Color BROWN = new Color(100, 69, 19);
 
@@ -33,7 +35,13 @@ class MenuGUI {
         newGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(!gameOngoing)startNewGame();
+                if(!gameOngoing) {
+                    try {
+                        startNewGame();
+                    } catch (UnknownHostException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
                 else continueGame();
             }
         });
@@ -70,14 +78,20 @@ class MenuGUI {
         frame.setVisible(true);
     }
 
-    public void startNewGame() {
-        Object[] options = { "1", "2" };
+    public void startNewGame() throws UnknownHostException {
+        Object[] options = {"1", "2"};
         int choice = JOptionPane.showOptionDialog(null, "Select Number of Players", "Number of Players",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-
+        boolean network = false;
+        if (choice == 1) {
+            Object[] gameModes = {"Local", "Network"};
+            int choice2 = JOptionPane.showOptionDialog(null, "Select Your Game Mode", "Game Mode", JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, gameModes, gameModes[0]);
+            network = choice2 == 1;
+        }
         gameOngoing = true;
         newGameButton.setText("Continue");
-        game.init(choice);
+        game.init(choice, network);
         panel.setVisible(false);
         game.gui.setVisibility(true);
         game.gui.boardDrawing.repaint();
