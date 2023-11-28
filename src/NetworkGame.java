@@ -1,7 +1,7 @@
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public abstract class NetworkGame {
+public abstract class NetworkGame extends Thread{
     protected NetworkPlayer opponent;
     private Socket socket;
     private Game game;
