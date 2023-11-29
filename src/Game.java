@@ -3,6 +3,7 @@
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class Game {
@@ -54,6 +55,7 @@ public class Game {
     }
 
     public void init(int numberPlayers, boolean network) throws UnknownHostException {
+        System.out.println(InetAddress.getLocalHost().getHostAddress());
         this.network = network;
         board.setWon(false, "");
         board.clear();
@@ -84,6 +86,8 @@ public class Game {
             player2 = new HumanPlayer("Player 2", '2', Color.WHITE);
             myTurn = true;
         }
+        networkClient.start();
+
         currentTurn = player1;
         gui.footerText.setText(this.getCurrentTurn().name + "'s turn");
     }

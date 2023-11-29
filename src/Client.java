@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 import java.util.Arrays;
 
 public class Client extends NetworkGame{
-    String host = "172.20.41.18"; //192.168.1.82
+    InetAddress host = InetAddress.getByName("192.168.0.192"); //192.168.1.82 //192.168.0.117.
     int port = 8500;
     Client(NetworkPlayer opponent, Game game) throws UnknownHostException {
         super(game);
