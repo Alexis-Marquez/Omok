@@ -1,6 +1,7 @@
 //import MenuGUI.java.MenuGUI;
 
 import java.awt.*;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.InetAddress;
@@ -75,18 +76,19 @@ public class Game {
                 player2 = new NetworkPlayer("Client", this.board, Color.WHITE);
                 networkClient = new Server((NetworkPlayer) player2, this);
                 myTurn = true;
+                networkClient.start();
             } else {
                 player1 = new NetworkPlayer("Host", this.board, Color.BLACK);
                 player2 = new HumanPlayer("Client", '2', Color.WHITE);
                 networkClient = new Client((NetworkPlayer) player1, this);
                 myTurn = false;
+                networkClient.start();
             }
         } else {
             player1 = new HumanPlayer("Player 1", '1', Color.BLACK);
             player2 = new HumanPlayer("Player 2", '2', Color.WHITE);
             myTurn = true;
         }
-        networkClient.start();
 
         currentTurn = player1;
         gui.footerText.setText(this.getCurrentTurn().name + "'s turn");
@@ -114,9 +116,11 @@ public class Game {
                         gui.footerText.setText(board.winner + " has Won!");
                         menu.setButtonText("Start New Game");
                         menu.gameOngoing = false;
-                        networkClient.getNetwork().writeQuit();
-                        networkClient.getNetwork().close();
-                        network = false;
+                        if(network) {
+                            networkClient.getNetwork().writeQuit();
+                            networkClient.getNetwork().close();
+                            network = false;
+                        }
                     } else {
                         this.nextTurn();
                     }
@@ -127,6 +131,11 @@ public class Game {
             gui.footerText.setText(board.winner + " has Won!");
             menu.setButtonText("Start New Game");
             menu.gameOngoing = false;
+            try {
+                networkClient.getSocket().close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             gui.boardDrawing.repaint();
         }
     }

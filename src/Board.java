@@ -207,15 +207,15 @@ public class Board {
         while(count < 5){
             if(l >= 0 && u >= 0 && board[u][l] == symbol){
                 count++;
+                winningRow.add(new Place(l,u));
                 l--;
                 u--;
-                winningRow.add(new Place(l,u));
             }
             else if(r < board.length && d < board.length && board[d][r] == symbol){
                 count++;
+                winningRow.add(new Place(r,d));
                 r++;
                 d++;
-                winningRow.add(new Place(r,d));
             }
             else{
                 winningRow.clear();
@@ -235,15 +235,15 @@ public class Board {
         while(count<5){
             if(l >= 0 && d < board.length && board[d][l] == symbol){
                 count++;
+                winningRow.add(new Place(l,d));
                 l--;
                 d++;
-                winningRow.add(new Place(l,d));
             }
             else if(r < board.length && u >= 0 && board[u][r] == symbol){
                 count++;
+                winningRow.add(new Place(r,u));
                 r++;
                 u--;
-                winningRow.add(new Place(r,u));
             }
             else{
                 winningRow.clear();

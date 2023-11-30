@@ -1,7 +1,7 @@
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public abstract class NetworkGame extends Thread{
+public abstract class NetworkGame extends Thread {
     protected NetworkPlayer opponent;
     private Socket socket;
     private Game game;
@@ -27,9 +27,9 @@ public abstract class NetworkGame extends Thread{
                         game.network = true;
                         break;
                     case MOVE:
-                        opponent.pickPlace(x,y);
+                        opponent.pickPlace(x, y);
                         game.nextTurn();
-                        network.writeMoveAck(x,y);
+                        network.writeMoveAck(x, y);
                         game.gui.boardDrawing.repaint();
                         break;
                     case MOVE_ACK:
@@ -43,7 +43,12 @@ public abstract class NetworkGame extends Thread{
         });
         network.receiveMessagesAsync();
     }
-    NetworkAdapter getNetwork(){
+
+    NetworkAdapter getNetwork() {
         return this.network;
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 }
