@@ -14,7 +14,9 @@ public class Server extends NetworkGame {
     public void start() {
         super.start();
         try {
-            socket = new ServerSocket(8500).accept();
+            System.out.println("Server started at port: "+game.port);
+            socket = new ServerSocket(game.port).accept();
+            game.menu.setVisibility(false);
             receiveMessages(socket);
         } catch (IOException e) {
             throw new RuntimeException(e);

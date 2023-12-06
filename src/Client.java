@@ -4,16 +4,19 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class Client extends NetworkGame {
-    InetAddress host = InetAddress.getLocalHost();// InetAddress.getByName("192.168.1.82"); // 192.168.1.82
-    int port = 8500;
+    String host;// InetAddress.getByName("192.168.1.82"); // 192.168.1.82
+    int port;
 
-    Client(NetworkPlayer opponent, Game game) throws UnknownHostException {
+    Client(NetworkPlayer opponent, Game game, String host, int port) throws UnknownHostException {
         super(game);
+        this.host = host;
+        this.port = port;
         this.opponent = opponent;
         try {
-            Socket s = new Socket(host, port);
+            Socket s = new Socket(InetAddress.getByName("192.168.1.82"), port);
             System.out.println("Connection successful");
             receiveMessages(s);
+            getNetwork().writePlay();
         } catch (IOException e) {
             System.out.println("Connection not established");
             throw new RuntimeException(e);

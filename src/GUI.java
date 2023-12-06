@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.UnknownHostException;
@@ -73,7 +74,11 @@ public class GUI {
             @Override
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
-                game.pickPlace(e.getX(), e.getY());
+                try {
+                    game.pickPlace(e.getX(), e.getY());
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         };
     }

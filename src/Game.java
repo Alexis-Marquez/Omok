@@ -6,8 +6,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Random;
 
 public class Game {
+    public int port;
     MenuGUI menu;
     GUI gui;
     Board board = new Board(16);
@@ -33,7 +35,11 @@ public class Game {
             cpu.pickPlace();
             nextTurn();
         }
-        gui.footerText.setText(this.getCurrentTurn().name + "'s turn");
+        if(currentTurn.name.equalsIgnoreCase("Your")){
+            gui.footerText.setText(this.getCurrentTurn().name + " turn");
+        }else {
+            gui.footerText.setText(this.getCurrentTurn().name + "'s turn");
+        }
         myTurn = currentTurn.getClass() != NetworkPlayer.class;
     }
 
@@ -41,7 +47,12 @@ public class Game {
     Player player1;
     Player player2;
     boolean myTurn;
-    boolean host = false;
+
+    public void setHost(boolean host) {
+        this.host = host;
+    }
+
+    boolean host = true;
     NetworkGame networkClient;
 
     public Game() {
@@ -49,6 +60,7 @@ public class Game {
         menu = new MenuGUI(this);
         gui = new GUI(board, this, menu.getFrame());
         this.strategy = "smart";
+        port = new Random().nextInt((9000 - 8000) + 1) + 8000;
     }
 
     public static void main(String[] args) {
@@ -56,7 +68,6 @@ public class Game {
     }
 
     public void init(int numberPlayers, boolean network) throws UnknownHostException {
-        System.out.println(InetAddress.getLocalHost().getHostAddress());
         this.network = network;
         board.setWon(false, "");
         board.clear();
@@ -71,18 +82,14 @@ public class Game {
                 myTurn = true;
             }
         } else if (numberPlayers == 1 && this.network) {
-            if (host) {
-                player1 = new HumanPlayer("Host", '1', Color.BLACK);
-                player2 = new NetworkPlayer("Client", this.board, Color.WHITE);
-                networkClient = new Server((NetworkPlayer) player2, this);
+            if(host){
+                player1 = new HumanPlayer("Your", '1', Color.BLACK);
+                player2 = new NetworkPlayer("Opponent", this.board, Color.WHITE);
                 myTurn = true;
-                networkClient.start();
             } else {
-                player1 = new NetworkPlayer("Host", this.board, Color.BLACK);
-                player2 = new HumanPlayer("Client", '2', Color.WHITE);
-                networkClient = new Client((NetworkPlayer) player1, this);
+                player1 = new NetworkPlayer("Opponent", this.board, Color.BLACK);
+                player2 = new HumanPlayer("Your", '2', Color.WHITE);
                 myTurn = false;
-                networkClient.start();
             }
         } else {
             player1 = new HumanPlayer("Player 1", '1', Color.BLACK);
@@ -91,10 +98,14 @@ public class Game {
         }
 
         currentTurn = player1;
-        gui.footerText.setText(this.getCurrentTurn().name + "'s turn");
+        if(currentTurn.name.equalsIgnoreCase("Your")){
+            gui.footerText.setText(this.getCurrentTurn().name + " turn");
+        }else {
+            gui.footerText.setText(this.getCurrentTurn().name + "'s turn");
+        }
     }
 
-    public void pickPlace(int x, int y) {
+    public void pickPlace(int x, int y) throws IOException {
         BigDecimal xC = BigDecimal.valueOf((double) x / 25);
         BigDecimal xCord = xC.setScale(0, RoundingMode.HALF_UP);
         BigDecimal yC = BigDecimal.valueOf((double) y / 25);
@@ -116,19 +127,27 @@ public class Game {
                         gui.footerText.setText(board.winner + " has Won!");
                         menu.setButtonText("Start New Game");
                         menu.gameOngoing = false;
-                        if(network) {
+                        if (network) {
+                            networkClient.getSocket().close();
                             networkClient.getNetwork().writeQuit();
                             networkClient.getNetwork().close();
                             network = false;
                         }
                     } else {
-                        this.nextTurn();
+                        if(!this.network) {
+                            this.nextTurn();
+                        }
                     }
                     gui.boardDrawing.repaint();
                 }
             }
         } else {
-            gui.footerText.setText(board.winner + " has Won!");
+            if(board.winner.equalsIgnoreCase("Your")) {
+                gui.footerText.setText("You Have Won!");
+            }
+            else{
+                gui.footerText.setText(board.winner + " has Won!");
+            }
             menu.setButtonText("Start New Game");
             menu.gameOngoing = false;
             try {
@@ -138,5 +157,22 @@ public class Game {
             }
             gui.boardDrawing.repaint();
         }
+    }
+
+    public void startServer() {
+        new Thread(()->{
+            networkClient = new Server((NetworkPlayer) player2, this);
+            networkClient.start();
+        }).start();
+    }
+    public void startClient(String hostIp, int port){
+        new Thread(()->{
+            try {
+                networkClient = new Client((NetworkPlayer) player1, this, hostIp, port);
+                networkClient.start();
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
     }
 }
