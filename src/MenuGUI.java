@@ -24,16 +24,15 @@ class MenuGUI {
         this.game = game;
         frame = new JFrame("Omok");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(450, 500);
+        frame.setSize(450, 550);
 
         panel = new JPanel();
         panel.setLayout(new GridLayout(4, 1));
-        panel.setBackground(BROWN);
 
-        newGameButton = createStyledButton("Start New Game", Color.BLACK);
-        JButton rulesButton = createStyledButton("Rules", Color.BLACK);
-        JButton quitButton = createStyledButton("Quit", Color.BLACK);
-        JButton strategyButton = createStyledButton("CPU Strategy", Color.BLACK);
+        newGameButton = createStyledButton("Start New Game");
+        JButton rulesButton = createStyledButton("Rules");
+        JButton quitButton = createStyledButton("Quit");
+        JButton strategyButton = createStyledButton("CPU Strategy");
 
         newGameButton.addActionListener(new ActionListener() {
             @Override
@@ -101,7 +100,8 @@ class MenuGUI {
             game.init(1, true);
             game.setHost(true);
             game.startServer();
-            frame.add(createTwoPlayerOptionsPanel());
+            game.gui.setVisibility(false);
+            createTwoPlayerOptionsPanel();
         }
         else {
             game.init(choice, network);
@@ -114,7 +114,7 @@ class MenuGUI {
         game.gui.setVisibility(true);
     }
 
-    private JPanel createTwoPlayerOptionsPanel() throws UnknownHostException {
+    private void createTwoPlayerOptionsPanel() throws UnknownHostException {
         JPanel playerPanel = createPlayerPanel();
         JPanel opponentPanel = createOpponentPanel();
 
@@ -129,33 +129,69 @@ class MenuGUI {
         optionsPanel.add(messagePanel);
 
         // Show the option dialog
-        Object[] inputFields = {optionsPanel};
-        int option = JOptionPane.showConfirmDialog(frame, inputFields, "Enter Player and Opponent Information", JOptionPane.OK_CANCEL_OPTION);
-
-        // Process the selected option
-        if (option == JOptionPane.OK_OPTION) {
-            // Retrieve player's information
-            JTextField opponentHostField = (JTextField) opponentPanel.getComponent(1);
-            JTextField opponentIPField = (JTextField) opponentPanel.getComponent(3);
-            String opponentPort = opponentHostField.getText();
-            String opponentIP = opponentIPField.getText();
-            game.setHost(false);
-            game.init(1, true);
-            game.startClient(opponentIP, Integer.parseInt(opponentPort));
-            // Add logic to connect to the online game server using the provided information
-            setMessage("Connected as host at: " + opponentIP + " with port: " + opponentPort);
-            System.out.println("Connected as host at: " + opponentIP + " with port: " + opponentPort);
-            gameOngoing = true;
-            newGameButton.setText("Continue");
-            panel.setVisible(false);
-            game.gui.setVisibility(true);
-            game.gui.boardDrawing.repaint();
-        } else {
-            // User canceled the input
-            setMessage("Online game connection canceled.");
-        }
-
-        return optionsPanel;
+        JPanel connectionFrame = new JPanel();
+        connectionFrame.setLayout(new GridLayout(2, 1));
+        connectionFrame.add(optionsPanel);
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
+        JButton connect = new JButton("Connect");
+        JButton cancel = new JButton("Cancel");
+        JPanel connectPanel = new JPanel();
+        connectPanel.add(connect);
+        JPanel cancelPanel = new JPanel();
+        cancelPanel.add(cancel);
+        connect.setPreferredSize(new Dimension(100,40));
+        cancel.setPreferredSize(new Dimension(100,40));
+        buttonPanel.add(connectPanel);
+        buttonPanel.add(cancelPanel);
+        connectionFrame.add(buttonPanel);
+        frame.add(connectionFrame);
+        panel.setVisible(false);
+        connectionFrame.setVisible(true);
+        final boolean[] valid = {false};
+        connect.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JTextField opponentHostField = (JTextField) opponentPanel.getComponent(1);
+                JTextField opponentIPField = (JTextField) opponentPanel.getComponent(3);
+                String opponentPort = opponentHostField.getText();
+                String opponentIP = opponentIPField.getText();
+                game.setHost(false);
+                try {
+                    game.init(1, true);
+                } catch (UnknownHostException ex) {
+                    throw new RuntimeException(ex);
+                }
+                try {
+                    game.startClient(opponentIP, Integer.parseInt(opponentPort));
+                    valid[0] = true;
+                }catch (Exception err){
+                    setMessage("Please enter a valid Port Number");
+                    valid[0] = false;
+                }
+                // Add logic to connect to the online game server using the provided information
+                if(valid[0]) {
+                    setMessage("Connected as host at: " + opponentIP + " with port: " + opponentPort);
+                    System.out.println("Connected as host at: " + opponentIP + " with port: " + opponentPort);
+                    gameOngoing = true;
+                    newGameButton.setText("Continue");
+                    optionsPanel.setVisible(false);
+                    connectionFrame.setVisible(false);
+                    panel.setVisible(false);
+                    game.gui.setVisibility(true);
+                    game.gui.boardDrawing.repaint();
+                }
+            }
+        });
+        cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gameOngoing = false;
+                game.gui.goBackToMenu();
+                connectionFrame.setVisible(false);
+                setVisibility(true);
+                newGameButton.setText("New Game");
+            }
+        });
     }
 
     private JPanel createMessagePanel() {
@@ -215,10 +251,10 @@ class MenuGUI {
         newGameButton.setText("New Game");
     }
 
-    private JButton createStyledButton(String text, Color textColor) {
+    private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
-        button.setBackground(Color.LIGHT_GRAY);
-        button.setForeground(textColor);
+        button.setBackground(Color.DARK_GRAY);
+        button.setForeground(Color.WHITE);
         return button;
     }
 

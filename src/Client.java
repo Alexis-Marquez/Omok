@@ -13,7 +13,7 @@ public class Client extends NetworkGame {
         this.port = port;
         this.opponent = opponent;
         try {
-            Socket s = new Socket(InetAddress.getByName("192.168.1.82"), port);
+            Socket s = new Socket(InetAddress.getByName(host), port);
             System.out.println("Connection successful");
             receiveMessages(s);
             getNetwork().writePlay();

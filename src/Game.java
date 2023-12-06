@@ -68,6 +68,7 @@ public class Game {
     }
 
     public void init(int numberPlayers, boolean network) throws UnknownHostException {
+        port = new Random().nextInt((9000 - 8000) + 1) + 8000;
         this.network = network;
         board.setWon(false, "");
         board.clear();
@@ -115,6 +116,7 @@ public class Game {
                 if (board.isOccupied(xCord.intValue(), yCord.intValue())) {
                     if (board.isFull()) {
                         gui.footerText.setText("All places full, It's a draw!");
+                        port = new Random().nextInt((9000 - 8000) + 1) + 8000;
                     }
                     gui.footerText.setText("Place is Occupied, try another intersection!");
                 } else {
@@ -125,6 +127,7 @@ public class Game {
                             this.getCurrentTurn().name);
                     if (board.isWin()) {
                         gui.footerText.setText(board.winner + " has Won!");
+                        port = new Random().nextInt((9000 - 8000) + 1) + 8000;
                         menu.setButtonText("Start New Game");
                         menu.gameOngoing = false;
                         if (network) {

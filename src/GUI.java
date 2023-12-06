@@ -66,7 +66,6 @@ public class GUI {
         gamePanel.add(toolPanel, BorderLayout.NORTH);
         gamePanel.add(footer,BorderLayout.SOUTH);
         window.add(gamePanel);
-
     }
 
     private MouseAdapter pickPlace() {
