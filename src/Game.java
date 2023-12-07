@@ -156,7 +156,7 @@ public class Game {
                 networkClient.getNetwork().writeQuit();
                 networkClient.getSocket().close();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Could not close socket");
             }
             gui.boardDrawing.repaint();
         }

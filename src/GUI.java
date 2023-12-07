@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.UnknownHostException;
 import javax.swing.*;
 
@@ -30,26 +28,18 @@ public class GUI {
         buttons.add(goToMenu);
         buttons.setSize(100, 50);
         toolPanel.add(buttons);
-        goToMenu.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                goBackToMenu();
-            }
-        });
+        goToMenu.addActionListener(e -> goBackToMenu());
         play.setIcon(getNormalIcon("src/playButton.jpg"));
         play.setToolTipText("Play a new game");
         play.setMnemonic(KeyEvent.VK_N);
         goToMenu.setIcon(getNormalIcon("src/goBack.jpeg"));
         goToMenu.setToolTipText("Go back to the main menu");
         goToMenu.setMnemonic(KeyEvent.VK_M);
-        play.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    game.menu.startNewGame();
-                } catch (UnknownHostException ex) {
-                    throw new RuntimeException(ex);
-                }
+        play.addActionListener(e -> {
+            try {
+                game.menu.startNewGame();
+            } catch (UnknownHostException ex) {
+                throw new RuntimeException(ex);
             }
         });
 

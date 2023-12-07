@@ -3,7 +3,7 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CpuPlayerSmart extends Player{
-    private Board board;
+    private final Board board;
     HumanPlayer opponent;
     Board.Place prevMove;
     private char[][] currBoard;
@@ -31,15 +31,12 @@ public class CpuPlayerSmart extends Player{
     }
     public void pickPlace() {
         currBoard = board.getCurrentBoard();
-        if(block(board.getLastMove().getX(), board.getLastMove().getY(), this, opponent)){
-            return;
-        }
-        else{
+        if (!block(board.getLastMove().x(), board.getLastMove().y(), opponent)) {
             this.placeStone();
         }
     }
 
-    private boolean block(int x, int y, CpuPlayerSmart cpuPlayerSmart, HumanPlayer opponent) {
+    private boolean block(int x, int y, HumanPlayer opponent) {
         int l, r, count, tries;
         l = x-1;
         r = x+1;
@@ -223,10 +220,10 @@ public class CpuPlayerSmart extends Player{
             board.setWon(board.isWonBy(y, x, this), this.name);
         }
         else {
-            Board.Place curr = tryWin(prevMove.getX(),prevMove.getY());
-                board.placeStone(curr.getX(), curr.getY(), this);
-                prevMove = new Board.Place(curr.getX(), curr.getY());
-                board.setWon(board.isWonBy(curr.getY(), curr.getX(), this), this.name);
+            Board.Place curr = tryWin(prevMove.x(),prevMove.y());
+                board.placeStone(curr.x(), curr.y(), this);
+                prevMove = new Board.Place(curr.x(), curr.y());
+                board.setWon(board.isWonBy(curr.y(), curr.x(), this), this.name);
         }
     }
     private Board.Place tryWin(int x, int y) {
@@ -392,11 +389,11 @@ public class CpuPlayerSmart extends Player{
             int yRand;
             while(true){
                     if (n < 20) {
-                        xRand = prevMove.getX() + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
-                        yRand = prevMove.getY() + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+                        xRand = prevMove.x() + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
+                        yRand = prevMove.y() + ThreadLocalRandom.current().nextInt(-1, 1 + 1);
                     } else {
-                        xRand = prevMove.getX() + ThreadLocalRandom.current().nextInt(-board.size + prevMove.getX(), board.size - prevMove.getX() + 1);
-                        yRand = prevMove.getY() + ThreadLocalRandom.current().nextInt(-board.size + prevMove.getX(), board.size - prevMove.getX() + 1);
+                        xRand = prevMove.x() + ThreadLocalRandom.current().nextInt(-board.size + prevMove.x(), board.size - prevMove.x() + 1);
+                        yRand = prevMove.y() + ThreadLocalRandom.current().nextInt(-board.size + prevMove.x(), board.size - prevMove.x() + 1);
                     }
                     if(xRand< board.size&&xRand>=0&&yRand<board.size&&yRand>=0) {
                         if (!board.isOccupied(xRand, yRand)) {
@@ -411,9 +408,6 @@ public class CpuPlayerSmart extends Player{
                 return currPlace;
             }
         }
-    public String getName() {
-        return name;
-    }
 
     @Override
     public char getSymbol() {

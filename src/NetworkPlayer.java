@@ -10,13 +10,11 @@ public class NetworkPlayer extends Player {
         this.symbol = 'x';
     }
 
-    public boolean pickPlace(int x, int y){
+    public void pickPlace(int x, int y){
         if(!board.isOccupied(x,y)){
             board.placeStone(x, y, this);
             board.setWon(board.isWonBy(y, x, this), this.name);
-            return true;
         }
-        else return false;
     }
     @Override
     public char getSymbol() {

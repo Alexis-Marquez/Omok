@@ -3,7 +3,7 @@ import java.util.Objects;
 import java.util.Random;
 
 public class CpuPlayer extends Player {
-        private Board board;
+        private final Board board;
 
     @Override
     public boolean equals(Object o) {
@@ -16,7 +16,7 @@ public class CpuPlayer extends Player {
 
     @Override
     public int hashCode() {
-        return Objects.hash((Integer)super.hashCode(), board, name);
+        return Objects.hash(super.hashCode(), board, name);
     }
 
     public CpuPlayer(String name, Board board, Color color){
@@ -37,9 +37,6 @@ public class CpuPlayer extends Player {
         else{
             this.pickPlace();
         }
-    }
-    public String getName() {
-        return name;
     }
 
     @Override

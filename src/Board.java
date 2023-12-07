@@ -3,9 +3,9 @@
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Objects;
+
 public class Board {
-    int DEFAULT_SIZE = 15;
+//    int DEFAULT_SIZE = 15;
 
     public char[][] getCurrentBoard() {
         return board;
@@ -24,16 +24,15 @@ public class Board {
     protected int x1,x2,y1,y2;
     private final HashSet<Place> winningRow = new HashSet<>();
 
-    /** Create a new board of the default size. */
-    public Board() {
-        this.size = DEFAULT_SIZE;x1=x2=y1=y2=-5;
-        board = new char[size][size];
-        for (int col = 0; col<size;col++) {
-            for (int row = 0; row<size;row++) {
-                board[col][row] = '0';
-            }
-        }
-    }
+    //    public Board() {
+//        this.size = DEFAULT_SIZE;x1=x2=y1=y2=-5;
+//        board = new char[size][size];
+//        for (int col = 0; col<size;col++) {
+//            for (int row = 0; row<size;row++) {
+//                board[col][row] = '0';
+//            }
+//        }
+//    }
 
     /** Create a new board of the specified size. */
     public Board(int size) {
@@ -283,53 +282,28 @@ public class Board {
      * of a place on the board, with (0, 0) denoting the top-left
      * corner and (n-1, n-1) denoting the bottom-right corner,
      * where n is the size of the board.
+     *
+     * @param x 0-based column index of this place.
+     * @param y 0-based row index of this place.
      */
-    public static class Place {
-        /** 0-based column index of this place. */
-        public final int x;
-
-        /** 0-based row index of this place. */
-        public final int y;
-
-        /** Create a new place of the given indices.
+        public record Place(int x, int y) {
+        /**
+         * Create a new place of the given indices.
          *
          * @param x 0-based column (vertical) index
          * @param y 0-based row (horizontal) index
          */
-        public Place(int x, int y) {
-            this.x = x;
-            this.y = y;
+        public Place {
         }
-
-        public int getX() {
-            return x;
-        }
-
-        public int getY() {
-            return y;
-        }
-        // other methods if needed ...
+            // other methods if needed ...
 
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Place place = (Place) o;
-            return x == place.x && y == place.y;
+            public String toString() {
+                return "Place{" +
+                        "x=" + x +
+                        ", y=" + y +
+                        '}';
+            }
         }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash((Integer)x,(Integer) y);
-        }
-
-        @Override
-        public String toString() {
-            return "Place{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    '}';
-        }
-    }
 }

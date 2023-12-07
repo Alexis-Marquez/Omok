@@ -1,8 +1,5 @@
-import javax.accessibility.AccessibleComponent;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -42,41 +39,23 @@ class MenuGUI {
         JButton quitButton = createStyledButton("Quit");
         JButton strategyButton = createStyledButton("CPU Strategy");
 
-        newGameButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!gameOngoing) {
-                    try {
-                        startNewGame();
-                    } catch (UnknownHostException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                } else
-                    continueGame();
-            }
+        newGameButton.addActionListener(e -> {
+            if (!gameOngoing) {
+                try {
+                    startNewGame();
+                } catch (UnknownHostException ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else
+                continueGame();
         });
         newGameButton.setMnemonic(KeyEvent.VK_N);
-        rulesButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                displayRules();
-            }
-        });
+        rulesButton.addActionListener(e -> displayRules());
         rulesButton.setMnemonic(KeyEvent.VK_R);
-        quitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
+        quitButton.addActionListener(e -> System.exit(0));
         quitButton.setMnemonic(KeyEvent.VK_Q);
 
-        strategyButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                selectStrategy();
-            }
-        });
+        strategyButton.addActionListener(e -> selectStrategy());
         // Initialize the message panel
 
         // Initialize the message label
@@ -111,7 +90,7 @@ class MenuGUI {
             game.gui.setVisibility(false);
             createTwoPlayerOptionsPanel();
         } else {
-            game.init(choice, network);
+            game.init(choice, false);
             game.gui.setVisibility(true);
             game.gui.boardDrawing.repaint();
         }
@@ -156,41 +135,34 @@ class MenuGUI {
 //        panel.setVisible(false);
         connectionFrame.setVisible(true);
 
-        connect.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTextField opponentHostField = (JTextField) opponentPanel.getComponent(1);
-                JTextField opponentIPField = (JTextField) opponentPanel.getComponent(3);
-                String opponentPort = opponentHostField.getText();
-                String opponentIP = opponentIPField.getText();
-                game.setHost(false);
-                try {
-                    game.init(1, true);
-                } catch (UnknownHostException ex) {
-                    throw new RuntimeException(ex);
-                }
-                try {
-                    game.startClient(opponentIP, Integer.parseInt(opponentPort));
-                    valid = true;
-                } catch (Exception err) {
-                    setMessage("Please enter a valid Port Number");
-                    valid = false;
-                    game.setHost(true);
-                }
-                // Add logic to connect to the online game server using the provided information
-
-                }
-
-        });
-        cancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                gameOngoing = false;
-                game.gui.goBackToMenu();
-                connectionFrame.setVisible(false);
-                setVisibility(true);
-                newGameButton.setText("New Game");
+        connect.addActionListener(e -> {
+            JTextField opponentHostField = (JTextField) opponentPanel.getComponent(1);
+            JTextField opponentIPField = (JTextField) opponentPanel.getComponent(3);
+            String opponentPort = opponentHostField.getText();
+            String opponentIP = opponentIPField.getText();
+            game.setHost(false);
+            try {
+                game.init(1, true);
+            } catch (UnknownHostException ex) {
+                throw new RuntimeException(ex);
             }
+            try {
+                game.startClient(opponentIP, Integer.parseInt(opponentPort));
+                valid = true;
+            } catch (Exception err) {
+                setMessage("Please enter a valid Port Number");
+                valid = false;
+                game.setHost(true);
+            }
+            // Add logic to connect to the online game server using the provided information
+
+            });
+        cancel.addActionListener(e -> {
+            gameOngoing = false;
+            game.gui.goBackToMenu();
+            connectionFrame.setVisible(false);
+            setVisibility(true);
+            newGameButton.setText("New Game");
         });
     }
 
@@ -258,11 +230,12 @@ class MenuGUI {
     }
 
     private void displayRules() {
-        String rules = "Players alternate turns placing a stone of their\n" +
-                "color on an empty intersection.\n" +
-                "The winner is the first player to form an unbroken\n" +
-                "line of five stones of their color horizontally,\n" +
-                "vertically, or diagonally.";
+        String rules = """
+                Players alternate turns placing a stone of their
+                color on an empty intersection.
+                The winner is the first player to form an unbroken
+                line of five stones of their color horizontally,
+                vertically, or diagonally.""";
         JOptionPane.showMessageDialog(null, rules, "Rules",
                 JOptionPane.INFORMATION_MESSAGE);
     }
