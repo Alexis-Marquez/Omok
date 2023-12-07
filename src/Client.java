@@ -25,6 +25,8 @@ public class Client extends NetworkGame {
             System.out.println("Connection not established");
             game.menu.setMessage("Connection Refused, try again");
             game.menu.setValid(false);
+            game.setHost(true);
+            game.init(1, true);
         }
     }
     private void startGame(){

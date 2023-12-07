@@ -175,6 +175,7 @@ class MenuGUI {
                 } catch (Exception err) {
                     setMessage("Please enter a valid Port Number");
                     valid = false;
+                    game.setHost(true);
                 }
                 // Add logic to connect to the online game server using the provided information
 
