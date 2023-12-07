@@ -22,13 +22,13 @@ public class GUI {
         gamePanel.setSize(new Dimension(450, 500));
         JPanel buttons = new JPanel();
         toolPanel = new JToolBar();
-        toolPanel.setLayout(new GridLayout(1,3));
+        toolPanel.setLayout(new GridLayout(1, 3));
         JButton play;
         play = new JButton("New game");
         buttons.add(play);
         JButton goToMenu = new JButton("Menu");
         buttons.add(goToMenu);
-        buttons.setSize(100,50);
+        buttons.setSize(100, 50);
         toolPanel.add(buttons);
         goToMenu.addActionListener(new ActionListener() {
             @Override
@@ -59,12 +59,12 @@ public class GUI {
         this.gamePanel.setLayout(new BorderLayout());
         JPanel middlePanel = new JPanel();
         middlePanel.setLayout(new GridBagLayout());
-        boardDrawing = new BoardPanel(board,this.game);
+        boardDrawing = new BoardPanel(board, this.game);
         boardDrawing.addMouseListener(pickPlace());
         middlePanel.add(boardDrawing);
         gamePanel.add(middlePanel);
         gamePanel.add(toolPanel, BorderLayout.NORTH);
-        gamePanel.add(footer,BorderLayout.SOUTH);
+        gamePanel.add(footer, BorderLayout.SOUTH);
         window.add(gamePanel);
     }
 
@@ -82,18 +82,19 @@ public class GUI {
         };
     }
 
-            public void goBackToMenu() {
-                game.menu.setVisibility(true);
-                gamePanel.setVisible(false);
-            }
+    public void goBackToMenu() {
+        game.menu.setVisibility(true);
+        gamePanel.setVisible(false);
+    }
 
-            public void setVisibility(boolean b) {
-                gamePanel.setVisible(b);
-            }
+    public void setVisibility(boolean b) {
+        gamePanel.setVisible(b);
+        gamePanel.repaint();
+    }
 
-            private Icon getNormalIcon(String path) {
-                Image img = new ImageIcon(path).getImage();
-                Image newimg = img.getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH);
-                return new ImageIcon(newimg);
-            }
-        }
+    private Icon getNormalIcon(String path) {
+        Image img = new ImageIcon(path).getImage();
+        Image newimg = img.getScaledInstance(20, 20, java.awt.Image.SCALE_SMOOTH);
+        return new ImageIcon(newimg);
+    }
+}

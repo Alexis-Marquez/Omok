@@ -1,10 +1,9 @@
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public abstract class NetworkGame extends Thread {
     protected NetworkPlayer opponent;
-    private Socket socket;
+    protected Socket socket;
     protected Game game;
     NetworkAdapter network;
 
@@ -38,7 +37,7 @@ public abstract class NetworkGame extends Thread {
                         game.nextTurn();
                         game.gui.boardDrawing.repaint();
                         break;
-                    case CLOSE:
+                    case QUIT:
                         getSocket().close();
                         network.close();
                         break;

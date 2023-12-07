@@ -12,14 +12,27 @@ public class Client extends NetworkGame {
         this.host = host;
         this.port = port;
         this.opponent = opponent;
+        game.menu.setMessage("Connecting...");
         try {
             Socket s = new Socket(InetAddress.getByName(host), port);
-            System.out.println("Connection successful");
+            game.menu.setMessage("Connection successful");
+            game.menu.setValid(true);
             receiveMessages(s);
             getNetwork().writePlay();
+            startGame();
+
         } catch (IOException e) {
             System.out.println("Connection not established");
-            throw new RuntimeException(e);
+            game.menu.setMessage("Connection Refused, try again");
+            game.menu.setValid(false);
         }
+    }
+    private void startGame(){
+        game.menu.setMessage("Connected as host at: " + host + " with port: " + port);
+        game.menu.gameOngoing = true;
+        game.menu.newGameButton.setText("Continue");
+        game.menu.connectionFrame.setVisible(false);
+        game.menu.setVisibility(false);
+        game.gui.setVisibility(true);
     }
 }

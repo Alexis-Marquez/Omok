@@ -1,3 +1,4 @@
+import javax.accessibility.AccessibleComponent;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -7,17 +8,24 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 class MenuGUI {
-    private Color BROWN = new Color(100, 69, 19);
+
+    public JPanel connectionFrame;
 
     public JFrame getFrame() {
         return frame;
     }
+
     private final Game game;
     private final JFrame frame;
     private final JPanel panel;
-    private final JButton newGameButton;
+    final JButton newGameButton;
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    boolean valid = false;
     public boolean gameOngoing = false;
-    private JPanel messagePanel; // New panel for messages
     private JLabel messageLabel; // Label to display messages
 
     public MenuGUI(Game game) {
@@ -37,14 +45,14 @@ class MenuGUI {
         newGameButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(!gameOngoing) {
+                if (!gameOngoing) {
                     try {
                         startNewGame();
                     } catch (UnknownHostException ex) {
                         throw new RuntimeException(ex);
                     }
-                }
-                else continueGame();
+                } else
+                    continueGame();
             }
         });
         newGameButton.setMnemonic(KeyEvent.VK_N);
@@ -73,7 +81,6 @@ class MenuGUI {
 
         // Initialize the message label
 
-
         panel.add(newGameButton);
         panel.add(rulesButton);
         panel.add(strategyButton);
@@ -83,33 +90,34 @@ class MenuGUI {
     }
 
     public void startNewGame() throws UnknownHostException {
-        Object[] options = {"1", "2"};
+        Object[] options = { "1", "2" };
         int choice = JOptionPane.showOptionDialog(null, "Select Number of Players", "Number of Players",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
         boolean network = false;
         if (choice == 1) {
-            Object[] gameModes = {"Local", "Network"};
-            int choice2 = JOptionPane.showOptionDialog(null, "Select Your Game Mode", "Game Mode", JOptionPane.DEFAULT_OPTION,
+            Object[] gameModes = { "Local", "Network" };
+            int choice2 = JOptionPane.showOptionDialog(null, "Select Your Game Mode", "Game Mode",
+                    JOptionPane.DEFAULT_OPTION,
                     JOptionPane.QUESTION_MESSAGE, null, gameModes, gameModes[0]);
             network = choice2 == 1;
         }
         gameOngoing = true;
         newGameButton.setText("Continue");
         panel.setVisible(false);
-        if(network){
-            game.init(1, true);
+        if (network) {
             game.setHost(true);
+            game.init(1, true);
             game.startServer();
             game.gui.setVisibility(false);
             createTwoPlayerOptionsPanel();
-        }
-        else {
+        } else {
             game.init(choice, network);
             game.gui.setVisibility(true);
             game.gui.boardDrawing.repaint();
         }
     }
-    public void continueGame(){
+
+    public void continueGame() {
         panel.setVisible(false);
         game.gui.setVisibility(true);
     }
@@ -129,7 +137,7 @@ class MenuGUI {
         optionsPanel.add(messagePanel);
 
         // Show the option dialog
-        JPanel connectionFrame = new JPanel();
+        connectionFrame = new JPanel();
         connectionFrame.setLayout(new GridLayout(2, 1));
         connectionFrame.add(optionsPanel);
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
@@ -139,15 +147,15 @@ class MenuGUI {
         connectPanel.add(connect);
         JPanel cancelPanel = new JPanel();
         cancelPanel.add(cancel);
-        connect.setPreferredSize(new Dimension(100,40));
-        cancel.setPreferredSize(new Dimension(100,40));
+        connect.setPreferredSize(new Dimension(100, 40));
+        cancel.setPreferredSize(new Dimension(100, 40));
         buttonPanel.add(connectPanel);
         buttonPanel.add(cancelPanel);
         connectionFrame.add(buttonPanel);
         frame.add(connectionFrame);
-        panel.setVisible(false);
+//        panel.setVisible(false);
         connectionFrame.setVisible(true);
-        final boolean[] valid = {false};
+
         connect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -163,24 +171,15 @@ class MenuGUI {
                 }
                 try {
                     game.startClient(opponentIP, Integer.parseInt(opponentPort));
-                    valid[0] = true;
-                }catch (Exception err){
+                    valid = true;
+                } catch (Exception err) {
                     setMessage("Please enter a valid Port Number");
-                    valid[0] = false;
+                    valid = false;
                 }
                 // Add logic to connect to the online game server using the provided information
-                if(valid[0]) {
-                    setMessage("Connected as host at: " + opponentIP + " with port: " + opponentPort);
-                    System.out.println("Connected as host at: " + opponentIP + " with port: " + opponentPort);
-                    gameOngoing = true;
-                    newGameButton.setText("Continue");
-                    optionsPanel.setVisible(false);
-                    connectionFrame.setVisible(false);
-                    panel.setVisible(false);
-                    game.gui.setVisibility(true);
-                    game.gui.boardDrawing.repaint();
+
                 }
-            }
+
         });
         cancel.addActionListener(new ActionListener() {
             @Override
@@ -202,7 +201,6 @@ class MenuGUI {
         messagePanel.add(messageLabel);
         return messagePanel;
     }
-
 
     private JPanel createPlayerPanel() throws UnknownHostException {
         JTextField playerHostField = new JTextField(String.valueOf(game.port));
@@ -267,14 +265,16 @@ class MenuGUI {
         JOptionPane.showMessageDialog(null, rules, "Rules",
                 JOptionPane.INFORMATION_MESSAGE);
     }
-    public void setVisibility(boolean x){
+
+    public void setVisibility(boolean x) {
         panel.setVisible(x);
     }
-    public void setButtonText(String text){
+
+    public void setButtonText(String text) {
         newGameButton.setText(text);
     }
+
     public void setMessage(String message) {
         messageLabel.setText(message);
     }
 }
-

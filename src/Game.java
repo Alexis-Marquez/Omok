@@ -4,7 +4,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Random;
 
@@ -35,9 +34,9 @@ public class Game {
             cpu.pickPlace();
             nextTurn();
         }
-        if(currentTurn.name.equalsIgnoreCase("Your")){
+        if (currentTurn.name.equalsIgnoreCase("Your")) {
             gui.footerText.setText(this.getCurrentTurn().name + " turn");
-        }else {
+        } else {
             gui.footerText.setText(this.getCurrentTurn().name + "'s turn");
         }
         myTurn = currentTurn.getClass() != NetworkPlayer.class;
@@ -59,6 +58,7 @@ public class Game {
         game = false;
         menu = new MenuGUI(this);
         gui = new GUI(board, this, menu.getFrame());
+        gui.setVisibility(false);
         this.strategy = "smart";
         port = new Random().nextInt((9000 - 8000) + 1) + 8000;
     }
@@ -83,7 +83,7 @@ public class Game {
                 myTurn = true;
             }
         } else if (numberPlayers == 1 && this.network) {
-            if(host){
+            if (host) {
                 player1 = new HumanPlayer("Your", '1', Color.BLACK);
                 player2 = new NetworkPlayer("Opponent", this.board, Color.WHITE);
                 myTurn = true;
@@ -99,9 +99,9 @@ public class Game {
         }
 
         currentTurn = player1;
-        if(currentTurn.name.equalsIgnoreCase("Your")){
+        if (currentTurn.name.equalsIgnoreCase("Your")) {
             gui.footerText.setText(this.getCurrentTurn().name + " turn");
-        }else {
+        } else {
             gui.footerText.setText(this.getCurrentTurn().name + "'s turn");
         }
     }
@@ -137,7 +137,7 @@ public class Game {
                             network = false;
                         }
                     } else {
-                        if(!this.network) {
+                        if (!this.network) {
                             this.nextTurn();
                         }
                     }
@@ -145,15 +145,15 @@ public class Game {
                 }
             }
         } else {
-            if(board.winner.equalsIgnoreCase("Your")) {
+            if (board.winner.equalsIgnoreCase("Your")) {
                 gui.footerText.setText("You Have Won!");
-            }
-            else{
+            } else {
                 gui.footerText.setText(board.winner + " has Won!");
             }
             menu.setButtonText("Start New Game");
             menu.gameOngoing = false;
             try {
+                networkClient.getNetwork().writeQuit();
                 networkClient.getSocket().close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -163,18 +163,19 @@ public class Game {
     }
 
     public void startServer() {
-        new Thread(()->{
+        new Thread(() -> {
             networkClient = new Server((NetworkPlayer) player2, this);
             networkClient.start();
         }).start();
     }
-    public void startClient(String hostIp, int port){
-        new Thread(()->{
+
+    public void startClient(String hostIp, int port) {
+        new Thread(() -> {
             try {
                 networkClient = new Client((NetworkPlayer) player1, this, hostIp, port);
                 networkClient.start();
             } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
+                menu.setMessage("Connection Refused, try again");
             }
         }).start();
     }
